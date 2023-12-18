@@ -84,14 +84,14 @@ void loop() {
   rahmen();
   for (int runde = 1; runde <= 9; runde++) {  //main spiel
     // Bestimmen welcher Spieler am zug ist
-    if (runde % 2 == 0) {
+    /*if (runde % 2 == 0) {
       player = 1;
       spielername = "spieler 1";
     } else {
       player = 2;
       spielername = "spieler 2";
-    }
-
+    }*/
+    spielername = playerSwitch(runde);
     if (debug) {
       Serial.println("======");
       Serial.println(spielername);
@@ -115,8 +115,19 @@ void loop() {
       }
       lcdPrint("hat gewonnen");
       spielerSiege[player]++;
-      break;
+      for (int matrix = 0; matrix < 4; matrix++) {
+        lc[matrix].clearDisplay(0);
+      }
+      krone();
+      //break;
     }
+  }
+  if (!gewonnen) {
+    lcd.clear();
+    lcd.println("unedschieden");
+    lcd.setCursor(0, 1);
+    lcd.println("press any key");
+    inPutKeyPad();
   }
 }
 void lcdPrint(String meldung) {
@@ -312,6 +323,36 @@ String playerSwitch(int runde) {
     player = 2;
     spielername = "spieler 2";
   }
-  return "spieler" + player;
+  return spielername;
+}
+
+void krone() {
+  for (int xTemp = 1; xTemp <= 14; xTemp++) {   // Floor line
+    printLed(xTemp, 1);
+  }
+  for (int yTemp = 1; yTemp <= 14; yTemp++) {  // Site Lines
+    printLed(1, yTemp);
+    printLed(14, yTemp);
+  }
+  printLed(2, 13);
+  printLed(3, 12);
+  printLed(4, 11);
+  printLed(5, 12);
+  printLed(6, 13);
+  printLed(7, 14);
+  printLed(8, 14);
+
+  printLed(9, 13);
+  printLed(10, 12);
+  printLed(11, 11);
+  printLed(12, 12);
+  printLed(13, 13);
+  printLed(14, 14);
+
+
+  for (int yTemp = 3; yTemp <= 12; yTemp++) {  // Site Lines
+    printLed(7, yTemp);
+    printLed(8, yTemp);
+  }
 }
 // https://www.roboter-bausatz.de/projekte/4x4-tastenfeld-mit-arduino-ansteuern
