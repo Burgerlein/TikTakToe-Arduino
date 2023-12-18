@@ -12,7 +12,7 @@
   int y;  //achse
   int input;
   int countPlayerFields = 0;
-  int gewonnen = 0;
+  bool gewonnen = false;
   int brett[3][3] = { 0 };
   String spielername; 
 
@@ -60,7 +60,7 @@ void setup() {
   lcd.backlight();
 
   // Matrix Setup
-  for (int matrix = 0; matrix < 4; m++) {
+  for (int matrix = 0; matrix < 4; matrix++) {
     lc[matrix].shutdown(0, false);
     lc[matrix].setIntensity(0, 2);
     lc[matrix].clearDisplay(0);
@@ -76,7 +76,7 @@ void loop() {
     }
   }
   //oder int brett[3][3] ={0};
-  int gewonnen = 0;  //variablen die für die nächste runde zurückgesetzt werden müssen
+  //gewonnen = false;  //variablen die für die nächste runde zurückgesetzt werden müssen
   lcd.clear();       // zum aufräumen nach der letzten runde
   for (int matrix = 0; matrix < 4; matrix++) {
     lc[matrix].clearDisplay(0);
@@ -108,7 +108,7 @@ void loop() {
     } else {
       kreis(x, y);
     }
-    if (gewonnen == 1) {  // prüfen ob der spieler mit dem letzten zug einen sieg erziehlt hat
+    if (gewonnen) {  // prüfen ob der spieler mit dem letzten zug einen sieg erziehlt hat
       if (debug) {
         Serial.print("spiel wurde gewonnen von spieler ");
         Serial.println(player);
@@ -238,7 +238,7 @@ void checkAchsen() {
         countPlayerFields++; 
       } else { break; }
       if (countPlayerFields == 3) {  // countPlayerFields = 3 heist drei felder in einer rheie gehören dem player
-        gewonnen++;
+        gewonnen = true;
       }
     }
   }
@@ -249,7 +249,7 @@ void checkAchsen() {
         countPlayerFields++; 
       } else { break; }
       if (countPlayerFields == 3) {  // countPlayerFields = 3 heist drei felder in einer Spalte gehören dem player
-        gewonnen++;
+        gewonnen = true;
       }
     }
   }
@@ -257,7 +257,7 @@ void checkAchsen() {
 void checkKreuz() {
   if (brett[1][1] == player) {
     if ((brett[0][2] && brett[2][0] == player) | (brett[2][2] && brett[0][0] == player)) {
-      gewonnen++; // Kann man schöner lösen
+      gewonnen = true; // Kann man schöner lösen
     }
   }
 }
@@ -291,7 +291,7 @@ void rahmen() {
     printLed(xTemp, 15);
   }
 }
-void translateToMatrixCoords(int translateCoordinate) {
+int translateToMatrixCoords(int translateCoordinate) {
   return translateCoordinate * 5;
 }
 void kreis(int translateX, int translateY) {
@@ -303,5 +303,15 @@ void kreis(int translateX, int translateY) {
 void kreutz(int translateX, int translateY) {
   printLed(2 + translateToMatrixCoords(translateX), 2 + translateToMatrixCoords(translateY));
   printLed(3 + translateToMatrixCoords(translateX), 3 + translateToMatrixCoords(translateY));
+}
+String playerSwitch(int runde) {
+  if (runde % 2 == 0) {
+    player = 1;
+    spielername = "spieler 1";
+  } else {
+    player = 2;
+    spielername = "spieler 2";
+  }
+  return "spieler" + player;
 }
 // https://www.roboter-bausatz.de/projekte/4x4-tastenfeld-mit-arduino-ansteuern
